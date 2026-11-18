@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>清新新能源动态背景</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#dff5ff}canvas{display:block;width:100%;height:100%}
+</style>
+</head>
+<body>
+<canvas id="field" aria-hidden="true"></canvas>
+<script>
+(function(){
+  const canvas=document.getElementById('field');
+  const ctx=canvas.getContext('2d',{alpha:false});
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let w=1,h=1,dpr=1,last=performance.now(),time=0;
+  const clouds=[
+    {x:.02,y:.12,s:1.00,v:.004},{x:.28,y:.20,s:.72,v:.003},
+    {x:.58,y:.10,s:.88,v:.0035},{x:.83,y:.24,s:.64,v:.0025}
+  ];
+  const turbines=[
+    {x:.08,y:.665,s:.66,p:.2},{x:.20,y:.69,s:.42,p:1.5},
+    {x:.74,y:.68,s:.46,p:2.7},{x:.88,y:.65,s:.70,p:4.0},{x:.57,y:.70,s:.30,p:5.2}
+  ];
+
+  function resize(){
+    dpr=Math.min(devicePixelRatio||1,1.5);w=innerWidth;h=innerHeight;
+    canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);
+    canvas.style.width=w+'px';canvas.style.height=h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  function drawSun(){
+    const x=w*.84,y=h*.13,r=Math.min(w,h)*.075;
+    const glow=ctx.createRadialGradient(x,y,0,x,y,r*2.3);
+    glow.addColorStop(0,'rgba(255,244,174,.65)');glow.addColorStop(.45,'rgba(255,246,190,.25)');glow.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=glow;ctx.beginPath();ctx.arc(x,y,r*2.3,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,246,194,.70)';ctx.beginPath();ctx.arc(x,y,r*.62,0,Math.PI*2);ctx.fill();
+  }
+  function drawCloud(c){
+    const x=((c.x+time*c.v)%1.28-.14)*w,y=c.y*h,s=c.s*Math.min(w,h)/18;
+    ctx.fillStyle='rgba(255,255,255,.67)';ctx.beginPath();
+    ctx.ellipse(x,y,s*1.5,s*.72,0,0,Math.PI*2);
+    ctx.arc(x+s*.75,y-s*.38,s*.82,0,Math.PI*2);
+    ctx.arc(x+s*1.55,y-s*.08,s*.66,0,Math.PI*2);ctx.fill();
+  }
+  function drawHills(){
+    ctx.fillStyle='#a9dba1';ctx.beginPath();ctx.moveTo(0,h*.67);
+    ctx.bezierCurveTo(w*.17,h*.57,w*.31,h*.64,w*.46,h*.61);
+    ctx.bezierCurveTo(w*.64,h*.56,w*.79,h*.66,w,h*.59);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+    ctx.fillStyle='#78bd78';ctx.beginPath();ctx.moveTo(0,h*.73);
+    ctx.bezierCurveTo(w*.18,h*.65,w*.34,h*.75,w*.52,h*.68);
+    ctx.bezierCurveTo(w*.70,h*.62,w*.82,h*.73,w,h*.66);ctx.lineTo(w,h);ctx.lineTo(0,h);ctx.fill();
+  }
+  function drawTurbine(a){
+    const ground=a.y*h,hubX=a.x*w,hubY=ground-Math.min(h*.21,178)*a.s,r=Math.min(w,h)*.055*a.s;
+    ctx.lineCap='round';ctx.strokeStyle='rgba(75,111,119,.55)';ctx.lineWidth=Math.max(2,6*a.s);
+    ctx.beginPath();ctx.moveTo(hubX,ground);ctx.lineTo(hubX,hubY);ctx.stroke();
+    ctx.fillStyle='rgba(246,252,252,.88)';ctx.fillRect(hubX-2*a.s,hubY-4*a.s,17*a.s,8*a.s);
+    ctx.save();ctx.translate(hubX,hubY);ctx.rotate(time*.38+a.p);
+    for(let i=0;i<3;i++){
+      ctx.rotate(Math.PI*2/3);ctx.fillStyle='rgba(250,254,255,.90)';ctx.beginPath();
+      ctx.moveTo(0,-3*a.s);ctx.quadraticCurveTo(r*.52,-7*a.s,r,0);ctx.quadraticCurveTo(r*.48,5*a.s,0,3*a.s);ctx.fill();
+    }
+    ctx.restore();ctx.fillStyle='#5f929b';ctx.beginPath();ctx.arc(hubX,hubY,4.5*a.s,0,Math.PI*2);ctx.fill();
+  }
+  function drawEnergyFlow(){
+    ctx.save();ctx.setLineDash([9,15]);ctx.lineWidth=1.5;ctx.strokeStyle='rgba(47,176,151,.20)';
+    ctx.lineDashOffset=-(time*13)%24;ctx.beginPath();ctx.moveTo(-40,h*.78);
+    ctx.bezierCurveTo(w*.25,h*.72,w*.52,h*.86,w+40,h*.74);ctx.stroke();ctx.restore();
+  }
+  function drawGrass(){
+    for(let x=0;x<w;x+=10){
+      const n=(Math.sin(x*12.73)+1)/2,len=8+n*16,base=h+2,sway=reduced?0:Math.sin(time*1.2+x*.04)*3;
+      ctx.strokeStyle=n>.48?'rgba(47,135,72,.24)':'rgba(91,160,82,.20)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(x,base);ctx.quadraticCurveTo(x+sway*.4,base-len*.55,x+sway,base-len);ctx.stroke();
+    }
+  }
+  function frame(now){
+    const dt=Math.min((now-last)/1000,.08);last=now;if(!reduced)time+=dt;
+    const sky=ctx.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#b9e7fa');sky.addColorStop(.56,'#eaf9fd');sky.addColorStop(1,'#eef9ec');
+    ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);drawSun();clouds.forEach(drawCloud);drawHills();turbines.forEach(drawTurbine);drawEnergyFlow();drawGrass();
+    requestAnimationFrame(frame);
+  }
+  addEventListener('resize',resize);resize();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+body.mountain-hud:not(.inspection-mode) {
+  display:flex;
+  flex-direction:column;
+  height:100svh;
+  padding:0;
+}
+#farm-view {
+  --controls-width:clamp(242px,19.3vw,356px);
+  --report-width:clamp(336px,32.5vw,610px);
+  --gutter:clamp(12px,1.3vw,28px);
+  --panel-pad:clamp(12px,1vw,20px);
+  --panel-rule:var(--hud-rule);
+  flex:1 0 auto;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.farm-stage {
+  position:relative;
+  isolation:isolate;
+  flex:1 0 auto;
+  min-height:clamp(345px,48svh,640px);
+  display:grid;
+  grid-template-columns:var(--controls-width) minmax(0,1fr) var(--report-width);
+  grid-template-rows:minmax(0,1fr);
+  gap:var(--gutter);
+  padding:var(--gutter);
+}
+.farm-viewport {position:absolute;inset:0;z-index:-1;overflow:hidden;background:#24475d}
+#farm-view .mountain-stage {position:absolute;inset:0;height:auto;z-index:0}
+.farm-map-bar, #farm-view .scene-dock {
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:1;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:3px 5px;
+  border:1px solid #92bdcc99;
+  border-radius:4px;
+  background:var(--hud-glass);
+  white-space:nowrap;
+}
+.farm-map-bar {top:var(--gutter);max-width:calc(100% - 12px)}
+#farm-view .scene-dock {bottom:10px;top:auto}
+@media (width > 1100px) and (aspect-ratio > 5/4) {
+  .farm-viewport {background:transparent}
+  /* Centre the wind farm in the visible space between the two side panels. */
+  #farm-view .mountain-stage {
+    right:calc(var(--report-width) - var(--controls-width));
+    mask-image:linear-gradient(to right, #000 92%, transparent);
+  }
+  .farm-map-bar {left:calc((100% + var(--controls-width) - var(--report-width)) / 2)}
+  #farm-view .scene-dock {left:auto;right:calc(var(--report-width) + 2 * var(--gutter));transform:none}
+}
+#farm-view .scene-dock button, #farm-show-report {
+  padding:4px 7px;border:0;border-radius:2px;background:transparent;color:#c2dce8;font-size:12px;
+}
+#farm-show-report:hover,
+#farm-view .scene-dock button:hover, #farm-view .scene-dock button[aria-pressed=true] {
+  background:var(--hud-active);color:#f2fbff;
+}
+.farm-legend {padding:2px 5px;font-size:12px;color:#e3eff5;white-space:normal}
+#farm-image-legend > span {display:inline-block;margin-left:8px}
+#farm-overview-legend:not([hidden]) {display:inline-flex;gap:10px}
+.farm-legend [data-state]::before {content:'';display:inline-block;width:7px;height:7px;margin:0 5px 1px 0;background:#b6ccd5;border-radius:50%}
+.farm-legend [data-state="damaged"]::before {background:#ff4848}
+.farm-legend [data-state="clear"]::before {background:#45a7ff}
+#farm-show-report {display:none}
+@media(max-width:680px) {
+  #farm-show-report:not([hidden]) {display:inline-block;color:var(--hud-accent);border-left:1px solid var(--hud-rule)}
+}
+
+.farm-panel {
+  position:relative;
+  align-self:stretch;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+  height:0;
+  min-height:100%;
+  overflow:hidden;
+  color:#edf6fa;
+  background:var(--hud-glass);
+  border:1px solid var(--hud-line);
+  border-radius:5px;
+  box-shadow:var(--hud-shadow);
+}
+.farm-controls {grid-column:1}
+.farm-report-panel {grid-column:3}
+.farm-panel-head, .farm-section-title {
+  display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;
+}
+.farm-panel-head {
+  flex:none;
+  min-height:45px;
+  padding:8px var(--panel-pad);
+  background:var(--hud-heading);
+  border-bottom:1px solid var(--panel-rule);
+}
+.farm-panel-head h2 {
+  margin:0;padding-left:9px;border-left:3px solid #7dd8ef;
+  font:400 clamp(19px,1.4vw,26px)/1.2 var(--font-heading);
+}
+.farm-panel button:focus-visible, .farm-panel a:focus-visible, .farm-panel select:focus-visible,
+#farm-show-report:focus-visible {
+  outline:2px solid #a1e5f8;outline-offset:-2px;
+}
+.farm-section-title h3 {font:400 clamp(15px,1.12vw,21px)/1.35 var(--font-heading)}
+.farm-section-title small {
+  color:var(--hud-muted);font-size:11px;line-height:1.5;
+}
+.farm-launch {flex:none;padding:var(--panel-pad);border-bottom:1px solid var(--panel-rule)}
+.farm-actions {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:13px}
+.farm-actions a {
+  display:flex;justify-content:center;align-items:center;gap:6px;
+  padding:8px 4px;border:1px solid #78badf;border-radius:3px;background:var(--hud-active);color:#f5fcff;
+  font-size:14px;line-height:1.35;font-weight:550;
+}
+.farm-actions a:last-child {background:var(--hud-card);border-color:#79a6cc}
+.farm-actions a:hover {background:#287bb0;border-color:#9de1f5}
+.farm-actions svg {width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.45}
+#turbine-list {display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;margin-top:7px}
+#turbine-list .hud-unit {
+  display:flex;min-width:0;min-height:38px;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:4px 0;border:1px solid var(--hud-line);border-radius:3px;background:var(--hud-card);
+}
+#turbine-list .hud-unit[aria-pressed=true], #turbine-list .hud-unit:hover {
+  background:var(--hud-active);border-color:#79cce7;
+}
+#turbine-list .hud-unit-id {font:600 14px/1 var(--font-readout)}
+.unit-inspection-state {color:#c0d4df;font:500 12px/1.4 var(--font-body)}
+#turbine-list .unit-inspection-state {font-size:10px;white-space:nowrap}
+.unit-inspection-state.damaged {color:var(--hud-alert)}
+.unit-inspection-state.clear {color:#8fceff}
+.unit-inspection-state.uncertain {color:var(--hud-warn)}
+
+.farm-image-browser {display:flex;flex-direction:column;flex:1;min-height:0;padding:var(--panel-pad);gap:8px}
+#farm-record-filter {
+  max-width:53%;padding:4px 5px;background:var(--hud-input);border:1px solid var(--hud-line);border-radius:3px;
+  color:#daeff7;font:inherit;font-size:12px;
+}
+#farm-record-list {flex:1;min-height:0;overflow-y:auto;overscroll-behavior-y:contain;scrollbar-width:thin;scrollbar-color:#6394ac transparent}
+#farm-record-list:focus-visible {outline:2px solid var(--hud-accent);outline-offset:-2px}
+.farm-record-row {
+  display:grid;grid-template-columns:minmax(2ch,auto) minmax(0,1fr) clamp(56px,5vw,78px);
+  align-items:center;gap:8px;width:100%;min-width:0;padding:6px 5px;
+  border:1px solid transparent;border-bottom-color:#7494a746;border-radius:3px;
+  color:#eaf4f9;background:transparent;text-align:left;
+}
+.farm-record-number {color:#aad7ea;text-align:center;font:600 17px/1 var(--font-readout);font-variant-numeric:tabular-nums}
+.farm-record-row:hover {background:var(--hud-card)}
+.farm-record-row[aria-pressed=true], .farm-record-row[aria-current=true] {background:var(--hud-active);border-color:#6db1c9}
+.farm-record-row img, .farm-record-placeholder {
+  display:block;width:100%;height:48px;border:1px solid #77919e60;border-radius:3px;object-fit:contain;background:#152c3b;
+}
+.farm-record-placeholder {display:grid;place-items:center;color:#9bb7c6;font-size:11px}
+.farm-record-text {display:grid;gap:2px;min-width:0}
+.farm-record-text strong, .farm-record-text small {
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;
+}
+.farm-record-text strong {font-size:14px;line-height:1.4}
+.farm-record-text small {color:#b5cbd8;font-size:11px;font-variant-numeric:tabular-nums}
+#farm-record-list > button:not(.farm-record-row),
+#farm-record-detail button, .farm-retry {
+  padding:4px 8px;border:1px solid var(--hud-line);background:var(--hud-card);color:#d7ebf6;border-radius:3px;font:inherit;font-size:12px;
+}
+#farm-record-list > p, #farm-record-detail > p {color:#c4d8e3;font-size:13px;line-height:1.65}
+#turbine-list .farm-retry {grid-column:1/-1}
+#farm-record-detail {
+  flex:1;min-height:0;padding:var(--panel-pad);overflow:auto;overscroll-behavior:contain;
+  scrollbar-width:thin;overflow-wrap:anywhere;
+}
+#farm-record-detail:focus-visible {outline:2px solid var(--hud-accent);outline-offset:-2px}
+#farm-record-detail > .farm-record-message {margin:7px 0}
+#farm-record-source {color:var(--hud-muted);font-size:12px;white-space:nowrap}
+.farm-record-heading {margin:0;color:#f4faff;font:600 17px/1.4 var(--font-body)}
+.farm-record-meta {margin:3px 0 9px;color:var(--hud-muted);font-size:12px;line-height:1.6}
+.farm-record-badges, .farm-record-actions {display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:9px 0}
+.farm-record-badges span {padding:3px 6px;border:1px solid var(--hud-rule);border-radius:3px;background:var(--hud-card);font-size:12px}
+.farm-record-badges .high {color:var(--hud-warn);border-color:#a9784b}
+.farm-record-actions small {color:var(--hud-muted);font-size:12px}
+.farm-record-actions a {margin-left:auto;font-size:12px;color:var(--hud-accent);text-decoration:underline;text-underline-offset:3px}
+.farm-record-image {background:#0b2138;border-radius:3px;text-align:center;color:var(--hud-muted);font-size:12px}
+.farm-record-image img {display:block;width:100%;height:auto;max-height:clamp(160px,25svh,270px);object-fit:contain}
+.farm-record-sections {margin-top:12px}
+#farm-record-detail .report-section {padding:10px 0;border:0}
+#farm-record-detail .report-section h3 {
+  padding-left:8px;border-left:2px solid var(--hud-accent);margin:0 0 8px;
+  color:#def6ff;font:400 17px/1.3 var(--font-heading);
+}
+#farm-record-detail .report-section dl {
+  grid-template-columns:minmax(0, .85fr) minmax(0, 1.3fr);
+  gap:0 10px;background:#082e482e;border-block:1px solid var(--hud-rule);
+}
+#farm-record-detail .report-section :is(dl,p,li) {font-size:13px;line-height:1.65}
+#farm-record-detail .report-section :is(dt,dd) {padding:5px 0;border-bottom:1px solid var(--hud-rule)}
+#farm-record-detail .report-section dt {padding-left:5px;color:var(--hud-muted)}
+#farm-record-detail .report-section dd {padding-right:5px;color:#f4faff}
+#farm-record-detail .report-section dt:last-of-type, #farm-record-detail .report-section dd:last-of-type {border:0}
+#farm-record-detail .report-section ul {margin:0;padding-left:1.3em}
+@media(max-width:1100px), (max-aspect-ratio:5/4) {
+  body.mountain-hud:not(.inspection-mode) {height:auto;min-height:100svh}
+  .farm-stage {
+    display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);grid-template-rows:auto auto;gap:12px;
+    padding:12px;min-height:0;
+  }
+  .farm-viewport {position:relative;inset:auto;grid-column:1 / -1;height:clamp(280px,48svh,520px);z-index:auto;border-radius:5px}
+  #farm-view .mountain-stage {bottom:36px}
+  .farm-map-bar {top:8px}
+  #farm-view .scene-dock {bottom:2px;border:0;background:transparent}
+  .farm-controls,.farm-report-panel {grid-column:auto;height:clamp(430px,57svh,650px);min-height:0}
+}
+@media(max-width:680px) {
+  .farm-stage {grid-template-columns:minmax(0,1fr);gap:10px;padding:8px}
+  .farm-viewport {height:clamp(242px,min(45svh,calc(92vw + 38px)),370px)}
+  .farm-map-bar {top:6px;gap:3px}
+  .farm-controls,.farm-report-panel {height:auto;min-height:0}
+  #farm-record-list {max-height:265px}
+  #farm-record-detail {max-height:min(75svh,680px)}
+  .farm-report-panel:has(#farm-record-detail:is([data-record-id],[data-sample-id])) {min-height:min(78svh,690px)}
+}

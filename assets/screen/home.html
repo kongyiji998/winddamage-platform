@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#23618c">
+  <title>基于多模态大模型的风电塔灾损测算平台</title>
+  <link rel="stylesheet" href="/screen-assets/typography.css">
+  <link rel="stylesheet" href="/screen-assets/hud-theme.css">
+  <link rel="stylesheet" href="/screen-assets/overview.css">
+  <link rel="stylesheet" href="/screen-assets/farm-overview.css">
+  <link rel="stylesheet" href="/screen-assets/farm-damage-chart.css">
+  <link rel="stylesheet" href="/screen-assets/inspection.css">
+  <link rel="stylesheet" href="/screen-assets/inspection-progress.css">
+  <link rel="stylesheet" href="/screen-assets/inspection-menu.css">
+  <link rel="stylesheet" href="/screen-assets/report-tools.css">
+  <script defer src="/screen-assets/inspection-menu.js"></script>
+</head>
+<body class="mountain-hud inspection-mode">
+  <header id="inspection-header" class="hud-header" data-page="single"></header>
+  <script src="/screen-assets/inspection-header.js"></script>
+  <main id="workbench" aria-label="单图评估工作台">
+    <div class="inspection-grid">
+      <section class="inspection-panel image-panel" aria-labelledby="input-title">
+        <header class="inspection-panel-head"><h2 id="input-title">输入图像</h2></header>
+        <div class="image-controls">
+          <div class="turbine-field">
+            <label for="inspection-turbine">拍摄机组</label>
+            <select id="inspection-turbine" name="turbine_id" required disabled aria-describedby="turbine-hint"><option value="">请选择机组</option></select>
+            <span id="turbine-hint" role="status">评估结果将关联到所选机组。</span>
+            <button type="button" id="retry-turbines" hidden>重新加载</button>
+          </div>
+          <button type="button" id="drop" class="drop" aria-label="选择或更换待评估图片" aria-controls="file">
+            <i class="icon upload" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 15v5h16v-5M12 16V3M7 8l5-5 5 5"/></svg></i>
+            <strong>选择待评估图片</strong><span>点击或拖入 JPG、PNG、WebP</span>
+            <img id="thumbnail" alt="当前评估原图" hidden>
+          </button>
+          <input type="file" id="file" accept="image/*" hidden>
+          <p id="metadata" class="metadata" hidden></p>
+          <div class="upload-actions"><button type="button" id="analyze" class="primary" disabled>开始评估</button><button type="button" id="clear" class="plain" disabled>清空</button></div>
+          <div class="analysis-status"><p id="feedback" role="status"></p><span id="analysis-elapsed" class="progress-readout" hidden></span></div>
+          <div id="analysis-progress" class="progress-track" role="progressbar" aria-label="单图评估进度" aria-valuemin="0" aria-valuemax="100" hidden></div>
+        </div>
+        <section class="inspection-samples sample-block" aria-labelledby="sample-title">
+          <h3 id="sample-title">评估样例</h3><div id="samples" class="samples"></div>
+        </section>
+        <details class="recent-inspections">
+          <summary>最近评估</summary>
+          <div id="recent" class="empty">暂无评估记录</div><a href="/screen/history">全部历史记录 ↗</a>
+        </details>
+      </section>
+
+      <section class="inspection-panel output-panel" aria-labelledby="output-title">
+        <header class="inspection-panel-head">
+          <h2 id="output-title">结构化评估报告</h2>
+          <span id="report-source"></span>
+        </header>
+        <div id="report-empty">
+          <i class="icon document" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7m-7 4h5"/></svg></i>
+          <p id="report-state">等待输入图像</p>
+          <p id="report-hint">选择图片并点击「开始评估」，即可在这里查看逐项评估结果。</p>
+        </div>
+        <div id="report-body" hidden>
+          <p id="report-meta"></p>
+          <div id="summary" aria-label="评估摘要"></div>
+          <div id="report-tools"></div>
+          <div id="details"></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <main id="farm-view" aria-label="风场总览" hidden>
+    <div class="farm-stage">
+      <div class="farm-viewport">
+        <div class="mountain-stage">
+          <iframe id="farm-scene" data-src="/screen-assets/mountain_viewer.html" title="模拟山地风场，点击机组查看评估结果"></iframe>
+          <div class="stage-shading"></div>
+        </div>
+        <div class="farm-map-bar">
+          <span class="farm-legend" id="farm-legend" aria-live="polite">
+            <span id="farm-overview-legend">
+              <span data-state="damaged">红色 · 有病害</span>
+              <span data-state="clear">蓝色 · 未见病害</span>
+              <span data-state="uncertain">待评估</span>
+            </span>
+            <span id="farm-image-legend" hidden></span>
+          </span>
+          <button type="button" id="farm-show-report" hidden>查看本图报告</button>
+        </div>
+        <div class="scene-dock" role="group" aria-label="风场视角">
+          <div class="view-switch"><button type="button" data-view="overview" aria-pressed="true">全场视角</button><button type="button" data-view="turbine" aria-pressed="false">机组特写</button></div>
+        </div>
+      </div>
+
+      <aside class="farm-panel farm-controls" aria-labelledby="farm-control-title">
+        <header class="farm-panel-head"><h2 id="farm-control-title">评估工作台</h2></header>
+        <div class="farm-launch">
+          <div class="farm-actions">
+            <a id="farm-inspect" href="#inspection"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="15" rx="2"/><path d="m5 16 5-5 4 4 2-2 3 3"/><circle cx="15.8" cy="8.5" r="1"/></svg>单图评估</a>
+            <a id="farm-batch" href="/screen/batch"><svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="8" width="14" height="12" rx="2"/><path d="M7 5h12a2 2 0 0 1 2 2v9M5 17l4-4 4 4"/></svg>批量评估</a>
+          </div>
+          <div class="farm-section-title"><h3>评估机组</h3><small>历史汇总</small></div>
+          <div id="turbine-list" aria-label="选择风机"></div>
+        </div>
+        <section class="farm-image-browser" aria-labelledby="farm-images-title">
+          <div class="farm-section-title"><h3 id="farm-images-title">已评估图片</h3>
+            <select id="farm-record-filter" aria-label="筛选已评估图片">
+              <option value="all">全部记录</option><option value="current">当前机组</option>
+              <option value="unassigned">未关联机组</option><option value="samples">评估样例</option>
+            </select>
+          </div>
+          <div id="farm-record-list" role="region" aria-labelledby="farm-images-title" tabindex="0"></div>
+        </section>
+      </aside>
+
+      <aside class="farm-panel farm-report-panel" id="farm-report-panel" aria-labelledby="farm-detail-title">
+        <header class="farm-panel-head"><h2 id="farm-detail-title">结构化评估结果</h2>
+          <small id="farm-record-source" aria-live="polite"></small>
+        </header>
+        <div id="farm-record-detail" tabindex="0" role="region" aria-labelledby="farm-detail-title"></div>
+      </aside>
+    </div>
+
+    <section class="farm-assessment" id="farm-damage-chart" aria-labelledby="farm-assessment-title">
+      <div class="assessment-summary-row">
+        <div class="assessment-totals">
+          <div class="assessment-head"><h2 id="farm-assessment-title">评估概况</h2><small>全场</small></div>
+          <dl class="assessment-metrics">
+            <div><dt>累计评估</dt><dd><strong id="total">—</strong><small>份</small></dd></div>
+            <div><dt>本周评估</dt><dd><strong id="week">—</strong><small>份</small></dd></div>
+            <div class="assessment-high"><dt>高风险报告</dt><dd><strong id="high_risk">—</strong><small>份</small></dd></div>
+          </dl>
+          <div class="assessment-risk">
+            <span>高风险占比</span><span class="assessment-risk-track" aria-hidden="true"><i id="risk-fill"></i></span>
+            <strong id="risk-ratio">—</strong>
+          </div>
+        </div>
+        <div class="damage-scope-buttons" role="group" aria-label="评估统计范围">
+          <button type="button" data-scope="all" aria-pressed="true" aria-label="风场总体">全场</button>
+          <button type="button" data-scope="FT01" aria-pressed="false">FT01</button>
+          <button type="button" data-scope="FT02" aria-pressed="false">FT02</button>
+          <button type="button" data-scope="FT03" aria-pressed="false">FT03</button>
+          <button type="button" data-scope="FT04" aria-pressed="false">FT04</button>
+          <button type="button" data-scope="FT05" aria-pressed="false">FT05</button>
+        </div>
+      </div>
+      <div id="assessment-chart-status" role="status" hidden></div>
+      <div class="assessment-chart-grid">
+        <section class="damage-chart" data-chart="damage" aria-labelledby="damage-chart-title">
+          <div class="damage-chart-head"><h3 id="damage-chart-title">病害类别分布</h3></div>
+          <div class="chart-caption"><small id="damage-scope-summary"></small></div>
+          <div id="damage-plot" class="chart-plot"></div>
+          <p class="damage-count-note">每份报告同类病害计 1 处。</p>
+        </section>
+        <section class="damage-chart" data-chart="priority" aria-labelledby="priority-chart-title">
+          <div class="damage-chart-head"><h3 id="priority-chart-title">巡检优先级分布</h3></div>
+          <div class="chart-caption"><small id="priority-scope-summary"></small></div>
+          <div id="priority-plot" class="chart-plot"></div>
+          <p class="damage-count-note">每份报告计一次，缺失或无法识别的优先级归入「未判定」。</p>
+        </section>
+        <section class="damage-chart" data-chart="trend" aria-labelledby="trend-chart-title">
+          <div class="damage-chart-head">
+            <h3 id="trend-chart-title">评估趋势</h3>
+            <div class="trend-period-buttons" id="assessment-chart-period" role="group" aria-label="趋势时间范围">
+              <button type="button" data-period="daily" aria-pressed="true">近 7 天</button>
+              <button type="button" data-period="weekly" aria-pressed="false">近 8 周</button>
+            </div>
+          </div>
+          <div class="chart-caption">
+            <small id="trend-scope-summary"></small>
+            <span class="trend-legend"><span>评估总数</span><span>高风险报告</span></span>
+          </div>
+          <div id="trend-plot" class="chart-plot"></div>
+          <p class="damage-count-note" id="trend-period-note"></p>
+        </section>
+      </div>
+    </section>
+  </main>
+  <script src="/screen-assets/inspection-progress.js"></script>
+  <script src="/screen-assets/inspection-report.js"></script>
+  <script src="/screen-assets/inspection-recent.js"></script>
+  <script src="/screen-assets/inspection-turbines.js"></script>
+  <script src="/screen-assets/report-tools.js"></script>
+  <script src="/screen-assets/home.js"></script>
+  <script src="/screen-assets/farm-records.js"></script>
+  <script src="/screen-assets/farm-damage-chart.js"></script>
+  <script src="/screen-assets/farm-overview.js"></script>
+</body>
+</html>

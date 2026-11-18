@@ -1,0 +1,81 @@
+:root {
+  scrollbar-gutter: stable both-edges;
+  scrollbar-width: thin;
+  scrollbar-color: #49788e #0a213b;
+  background: #0a213b;
+  --workspace-width: 1560px;
+  --workspace-gutter: clamp(14px, 3vw, 52px);
+  --workspace-top: clamp(22px, 3vw, 48px);
+  --hud-glass: linear-gradient(138deg, rgb(23 64 104 / 88%), rgb(11 38 70 / 86%) 58%, rgb(9 47 68 / 80%));
+  --hud-heading: linear-gradient(105deg, rgb(37 109 154 / 62%), rgb(39 79 134 / 44%) 57%, rgb(28 83 112 / 24%));
+  --hud-header: linear-gradient(105deg, rgb(9 30 61 / 94%), rgb(24 65 111 / 92%) 49%, rgb(12 53 73 / 92%));
+  --hud-card: linear-gradient(118deg, rgb(52 102 145 / 48%), rgb(22 59 92 / 63%));
+  --hud-active: linear-gradient(110deg, #18759a, #215f9a);
+  --hud-line: rgb(146 204 232 / 44%);
+  --hud-rule: rgb(150 196 223 / 24%);
+  --hud-muted: #c2d9e8;
+  --hud-accent: #8ae2f7;
+  --hud-warn: #ffcf94;
+  --hud-alert: #ffb09f;
+  --hud-clear: #98e5cc;
+  --hud-input: #102f50;
+  --hud-shadow: inset 0 1px 0 rgb(196 234 255 / 8%), 0 8px 24px rgb(2 16 36 / 22%);
+}
+
+body.mountain-hud, body.work-page {
+  isolation: isolate;
+  margin: 0;
+  color-scheme: dark;
+  background: #0a213b;
+}
+body.mountain-hud::before, body.work-page::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(165deg, #16396168, #0c345582 56%, #092c40da),
+              url("/screen-assets/mountain-farm.webp") center / cover no-repeat;
+}
+.hud-header, .farm-panel, .inspection-panel, .work-panel {
+  backdrop-filter: blur(3px);
+}
+.sc-page.mountain-hud .sc-panel {
+  background:var(--hud-glass);
+  border-color:var(--hud-line);
+  box-shadow:var(--hud-shadow);
+}
+.sc-page.mountain-hud .sc-btn.primary {
+  background:var(--hud-active);
+  border-color:var(--hud-line);
+  box-shadow:none;
+}
+.sc-page.mountain-hud .sc-login-box {width:min(400px,calc(100% - 28px))}
+@media (prefers-reduced-motion:no-preference) {
+  @view-transition {navigation:auto}
+  ::view-transition-old(root), ::view-transition-new(root) {animation-duration:140ms}
+}
+@media (max-width:760px) {
+  :root {--workspace-top:16px}
+}
+@media (pointer:coarse) {
+  :root {scrollbar-gutter:auto}
+}
+
+.inspection-alert {
+  box-sizing: border-box;
+  flex: 1 0 100%;
+  padding: 10px 13px;
+  border: 1px solid #b86b70;
+  border-left: 4px solid #ff958e;
+  border-radius: 4px;
+  background: linear-gradient(115deg, #522c40, #302b41);
+  color: #fff0ec;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.inspection-alert strong {color: #ffc6ba}
+.inspection-alert p {margin: 3px 0 0}
+.dialog-body > .inspection-alert {margin-bottom: 14px}
+.farm-record-text .farm-record-risk {color: #ffd0c4}

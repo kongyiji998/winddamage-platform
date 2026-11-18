@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>山地风电场机组模型</title>
+<link rel="stylesheet" href="/screen-assets/typography.css">
+<style>
+  * {box-sizing:border-box}
+  html,body {width:100%;height:100%;margin:0;overflow:hidden}
+  body {position:relative;background:#96bad4;user-select:none}
+  #panorama,.models,#stations {position:absolute;inset:0;width:100%;height:100%}
+  #panorama {pointer-events:none;background:url("/screen-assets/mountain-farm.webp") center / cover no-repeat}
+  .models,#stations {pointer-events:none}
+  .station {position:absolute;left:0;top:0;pointer-events:none}
+  .station svg {position:absolute;bottom:0;left:0;transform:translateX(-50%);overflow:visible}
+  .station svg [data-part] {pointer-events:visiblePainted;cursor:pointer}
+  .station svg .fault {fill:url(#marked-coat);--sail:url(#marked-coat);--tip:#d2142d}
+  .station svg .fault .steel-detail {fill:#ba0e25}
+  .station svg .clear {fill:url(#clear-coat);--sail:url(#clear-coat);--tip:#0759b4}
+  .station svg .clear .steel-detail {fill:#0759b4}
+  body.gpu .station svg {visibility:hidden}
+  .unit-shadow {
+    position:absolute;left:0;bottom:0;transform-origin:left center;transform:rotate(-153deg);
+    width:calc(var(--model-height) * .27);height:max(.6px,calc(var(--model-height) * .011));
+    background:linear-gradient(90deg,#241d12a8,#2722153d 75%,transparent);
+    clip-path:polygon(0 0,100% 58%,100% 92%,0 94%);filter:blur(.6px);opacity:.55;
+  }
+  .unit-tag {
+    position:absolute;left:0;top:var(--tag-offset,3px);transform:translateX(-50%);pointer-events:auto;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:2px 6px;white-space:nowrap;
+    background:#162e39db;color:#f2f6f6;border:1px solid #aec7d28c;border-radius:3px;
+    font:600 12px/1.2 var(--font-readout),sans-serif;letter-spacing:.04em;
+    box-shadow:0 1px 3px #09263430;
+  }
+  .unit-tag::before {content:'';display:block;width:4px;height:4px;border-radius:50%;background:#c3d1d4}
+  .unit-tag[aria-pressed=true],.unit-tag:hover {border-color:#8cdbf3;background:#1a4253;color:white}
+  [data-alert] .unit-tag::before {background:#ff3948;border-radius:0;transform:rotate(45deg)}
+  [data-clear] .unit-tag::before {background:#369aff}
+  .part-caption {display:none}
+  body[data-view=turbine] :is([data-alert],[data-clear]) .part-caption {
+    display:block;position:absolute;left:0;top:calc(var(--tag-offset,3px) + 20px);transform:translateX(-50%);
+    width:max-content;max-width:90vw;padding:2px 7px;color:#fff;background:#651825ec;border:1px solid #ff626c;
+    border-radius:3px;text-align:center;font:500 12px/1.45 var(--font-body),sans-serif;
+  }
+  body[data-view=turbine] [data-clear] .part-caption {background:#074878ed;border-color:#5ab3ff}
+  .unit-tag:focus-visible {outline:2px solid white;outline-offset:2px}
+  @media (max-width:350px) {
+    body[data-view=overview] [data-unit=FT01] .unit-tag {transform:translateX(clamp(-80%,calc(2px - var(--foot-x)),-50%))}
+    body[data-view=overview] [data-unit=FT05] .unit-tag {transform:translateX(clamp(-50%,calc(100vw - var(--foot-x) - 100% - 2px),-20%))}
+  }
+  #turbine-materials {position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
+  [hidden] {display:none!important}
+</style>
+</head>
+<body>
+<div id="panorama" aria-hidden="true"></div>
+<svg id="turbine-materials" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="tower-coat"><stop stop-color="#969f9c"/><stop offset=".32" stop-color="#d2d7cb"/><stop offset=".58" stop-color="#eae9db"/><stop offset="1" stop-color="#a8adaa"/></linearGradient>
+    <linearGradient id="wing-coat"><stop stop-color="#a5b0ad"/><stop offset=".44" stop-color="#e1e4d7"/><stop offset=".72" stop-color="#eeece0"/><stop offset="1" stop-color="#b5bdb6"/></linearGradient>
+    <linearGradient id="shell-coat" x2=".25" y2="1"><stop stop-color="#ececde"/><stop offset=".5" stop-color="#cbd2c6"/><stop offset="1" stop-color="#929e98"/></linearGradient>
+    <linearGradient id="marked-coat"><stop stop-color="#c8122c"/><stop offset=".55" stop-color="#ff3948"/><stop offset="1" stop-color="#ea142e"/></linearGradient>
+    <linearGradient id="clear-coat"><stop stop-color="#0954b6"/><stop offset=".55" stop-color="#329dff"/><stop offset="1" stop-color="#1476dc"/></linearGradient>
+    <path id="sail" d="M-.54 .2C-1.64-6.4-1.58-10.7-1.02-16.6L.43-36.9Q.51-37.4.69-37.18L.46-11.4.47 .1Z"/>
+    <g id="finished-blade">
+      <use href="#sail" fill="var(--sail,url(#wing-coat))"/>
+      <path d="M.34-35.3l.09-1.6q.08-.5.26-.28l-.018 1.94ZM.06-30.65l.10-1.42.49.01-.016 1.46Z" fill="var(--tip,#7b8486)"/>
+    </g>
+  </defs>
+</svg>
+<div id="stations" role="group" aria-label="风电场机组"></div>
+<template id="turbine">
+  <div class="station">
+    <span class="unit-shadow" aria-hidden="true"></span>
+    <svg viewBox="0 0 100 100" aria-hidden="true">
+      <ellipse cx="50" cy="99.55" rx="2.65" ry=".55" fill="#9d9f90" data-part="foundation"/>
+      <g data-part="tower" fill="url(#tower-coat)">
+        <path d="M48.68 99.55l.56-64.42h1.65l.54 64.43q-1.39.37-2.75-.01Z"/>
+        <path class="steel-detail" d="M49.33 98.94v-1.47l.66.02v1.48Z" fill="#78827b"/>
+      </g>
+      <g data-part="nacelle" fill="url(#shell-coat)">
+        <path d="M45.72 34.67q.32-1.02 1.77-1.17l4.42.19q.82.11.94 1.03l-.4.97-5.36.29q-1.23-.24-1.37-1.31Z"/>
+        <path class="steel-detail" d="M47.3 33.46l1.42.05.24.13-1.58.04Z" fill="#84918b"/>
+      </g>
+      <g transform="translate(51.55 35.15) scale(.83 .99)">
+        <g data-part="blade">
+          <use href="#finished-blade"/>
+          <use href="#finished-blade" transform="rotate(120)"/>
+          <use href="#finished-blade" transform="rotate(240)"/>
+        </g>
+      </g>
+      <ellipse cx="51.65" cy="35.12" rx="1.30" ry="1.34" fill="url(#shell-coat)" data-part="hub"/>
+    </svg>
+    <button type="button" class="unit-tag"></button>
+    <span class="part-caption" aria-hidden="true"></span>
+  </div>
+</template>
+<script type="module" src="/screen-assets/mountain-scene.js"></script>
+</body>
+</html>

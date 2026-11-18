@@ -1,0 +1,105 @@
+.batch-queue-section:has(#filelist[hidden]) {display: none}
+#filelist {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  max-height: 166px;
+  padding: 3px;
+  overflow-y: auto;
+}
+#filelist button {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px 4px 4px;
+  border: 1px solid var(--hud-rule);
+  border-radius: 3px;
+  background: var(--hud-card);
+  text-align: left;
+}
+#filelist button:hover, #filelist button[aria-pressed=true] {
+  background: var(--hud-active);
+  border-color: #80d4f3;
+}
+#filelist button img {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+#filelist button span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+.batch-mode #export {background: transparent}
+.batch-mode #export:disabled, .batch-results:empty {display: none}
+.batch-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: var(--panel-pad);
+}
+.batch-summary > div {
+  min-width: 0;
+  padding: 8px clamp(7px, 1vw, 14px);
+  border: 1px solid #3c5c6e;
+  border-radius: 3px;
+  background: var(--hud-card);
+}
+.batch-summary dt {color: #aec9d7; font-size: 13px}
+.batch-summary dd {font: 600 26px/1.2 var(--font-readout); font-variant-numeric: tabular-nums}
+.batch-results {
+  margin: var(--panel-pad);
+  max-height: clamp(152px, 24vh, 245px);
+  overflow: auto;
+  scroll-padding-top: 42px;
+  border: 1px solid #365465;
+  border-radius: 4px;
+}
+.batch-results:focus-visible {outline: 2px solid #98e6ff; outline-offset: 2px}
+.batch-results table {
+  min-width: 430px;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+.batch-results :is(th, td) {
+  padding: 8px 9px;
+  border-bottom: 1px solid #34505e;
+  overflow-wrap: anywhere;
+}
+.batch-results th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--hud-input);
+  color: #c1dce8;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.batch-results :is(th, td):first-child {width: 24%}
+.batch-results :is(td:nth-last-child(2), td:last-child) {white-space: nowrap}
+.batch-results tr:last-child td {border: 0}
+.batch-results tr:has(button[aria-pressed=true]), .batch-results tr[aria-selected=true] {background: #1c3d50}
+.batch-results td button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #a8e4ff;
+  font: inherit;
+  text-align: left;
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.batch-results .sc-badge {display: inline-block; font-size: 12px}
+.batch-results .ok {color: var(--hud-clear)}
+.batch-results .hi {color: var(--hud-warn)}
+.batch-results .err {color: var(--hud-alert)}
+.batch-results:not(:empty) ~ :is(#report-empty, #report-body) {border-top: 1px solid #365465}
+.batch-results:not(:empty) ~ #report-empty {flex: none; min-height: 190px}

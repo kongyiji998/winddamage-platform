@@ -1,0 +1,161 @@
+.inspection-menu {position:relative}
+.inspection-menu[open] {z-index:5}
+nav .inspection-menu > summary {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  height:100%;
+  list-style:none;
+  white-space:nowrap;
+  cursor:pointer;
+  user-select:none;
+}
+.inspection-menu summary::-webkit-details-marker {display:none}
+.inspection-menu summary::before {
+  content:"";
+  order:1;
+  width:6px;
+  height:6px;
+  border-right:1.5px solid currentColor;
+  border-bottom:1.5px solid currentColor;
+  transform:translateY(-2px) rotate(45deg);
+}
+.inspection-menu[open] summary::before {transform:translateY(2px) rotate(225deg)}
+.inspection-subnav {
+  position:absolute;
+  top:calc(100% + 4px);
+  left:0;
+  min-width:max(100%,8.75rem);
+  padding:4px;
+  border:1px solid #496a7b;
+  border-radius:5px;
+  background:linear-gradient(125deg,#194971,#103354);
+  box-shadow:0 8px 20px #04111c69;
+}
+.inspection-subnav a {
+  display:block;
+  padding:9px 12px;
+  border-radius:3px;
+  color:#dfedf4;
+  font:500 14px/1.4 var(--font-body);
+  white-space:nowrap;
+  text-decoration:none;
+}
+.inspection-subnav a:hover, .inspection-subnav a:focus-visible {background:#284959}
+.inspection-subnav a[aria-current] {background:#285369;color:#c1f0ff}
+
+/* Centring the title and navigation independently keeps the clock from shifting them. */
+.hud-header {
+  position:relative;
+  flex:none;
+  z-index:5;
+  display:grid;
+  justify-items:center;
+  align-content:center;
+  gap:6px;
+  padding:10px clamp(12px,2vw,38px) 8px;
+  color:#eff8fc;
+  background:var(--hud-header);
+  border-top:2px solid #75bee5;
+  border-bottom:1px solid var(--hud-line);
+}
+.hud-header .system-title {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:clamp(8px,1.2vw,20px);
+  min-width:0;
+  max-width:100%;
+  margin:0;
+  font:400 clamp(26px,2.2vw,39px)/1.2 var(--font-heading);
+  letter-spacing:.045em;
+  text-align:center;
+}
+.system-title::before, .system-title::after {
+  content:"";
+  width:clamp(16px,3.2vw,56px);
+  height:1px;
+  background:linear-gradient(90deg,transparent,#67b6d3);
+}
+.system-title::after {transform:scaleX(-1)}
+.system-title a span {display:inline-block}
+.hud-header a {color:inherit;text-decoration:none}
+.hud-header nav {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  width:min(100%,clamp(280px,24vw,360px));
+  align-items:stretch;
+  justify-content:center;
+  gap:4px;
+  max-width:100%;
+}
+.hud-header nav > a, .hud-header nav summary {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:32px;
+  padding:6px 4px;
+  border:1px solid transparent;
+  border-radius:3px;
+  background:transparent;
+  color:#c4d9e5;
+  font:500 14px/1.25 var(--font-body);
+  white-space:nowrap;
+}
+.hud-header nav > a:hover, .hud-header nav summary:hover {color:#f2fbff;background:var(--hud-card)}
+.hud-header nav > [aria-current],
+.hud-header .inspection-menu:has([aria-current]) > summary {
+  color:#d7f6ff;
+  border-color:#508399;
+  background:var(--hud-active);
+  box-shadow:inset 0 -2px #76cfea;
+}
+.hud-header .header-time {
+  position:absolute;
+  top:50%;
+  right:clamp(12px,2vw,38px);
+  transform:translateY(-50%);
+  display:grid;
+  justify-items:end;
+  gap:4px;
+  color:#b8cfda;
+  font:400 12px/1.3 var(--font-body);
+  white-space:nowrap;
+}
+.header-clock, .header-user {display:flex;align-items:baseline;gap:9px}
+.header-clock time, .header-clock #date {
+  font-family:var(--font-readout);
+  font-variant-numeric:tabular-nums;
+}
+.header-clock time {color:#e2f2f9;font-weight:600;font-size:20px;line-height:1}
+.header-clock #date {font-size:14px}
+.header-user #user {max-width:14ch;overflow:hidden;text-overflow:ellipsis}
+.header-user a {color:#d6edf8}
+.header-user a:hover {text-decoration:underline}
+.hud-header [hidden] {display:none}
+@media(max-width:1000px) {
+  .header-clock #date {display:none}
+}
+@media(min-width:761px) and (max-width:1100px) {
+  .hud-header .header-time {top:auto;bottom:6px;transform:none;gap:2px}
+}
+@media(max-width:760px) {
+  .hud-header {gap:4px;padding:9px 8px 7px}
+  .hud-header .system-title {font-size:clamp(23px,4.5vw,29px)}
+  .hud-header nav {gap:2px}
+  .hud-header nav > a, .hud-header nav summary {
+    padding:6px 3px;font-size:13px;
+  }
+  .hud-header .header-time {
+    position:static;
+    transform:none;
+    display:none;
+  }
+  .hud-header .header-time:has(.account-link:not([hidden])) {display:flex}
+  .hud-header .header-clock {display:none}
+}
+@media(max-width:430px) {
+  .hud-header .system-title {font-size:clamp(16px,4.7vw,21px);letter-spacing:.025em}
+  .system-title::before,.system-title::after {display:none}
+}

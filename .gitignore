@@ -1,0 +1,32 @@
+# 本地模型与训练检查点
+qwen3.5-4b*/
+*.safetensors
+*.safetensors.index.json
+*.gguf
+*.bin
+*.pt
+*.pth
+*.ckpt
+*.onnx
+
+# 用户评估、上传原图与导出文件
+*.db
+*.db-*
+*.db.bak*
+*.sqlite
+*.sqlite3
+*.sqlite*-*
+/persisted_images/
+/exports/
+
+# 本地配置与生成文件
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+.gradio/
+.vscode/
+.DS_Store
+*.log

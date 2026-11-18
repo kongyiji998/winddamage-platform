@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#23618c">
+<title>历史记录 · 基于多模态大模型的风电塔灾损测算平台</title>
+<link rel="stylesheet" href="/screen-assets/screen.css">
+<link rel="stylesheet" href="/screen-assets/hud-theme.css">
+<link rel="stylesheet" href="/screen-assets/workspace-sub.css">
+<link rel="stylesheet" href="/screen-assets/history-selection.css">
+<link rel="stylesheet" href="/screen-assets/inspection-menu.css">
+<link rel="stylesheet" href="/screen-assets/report-tools.css">
+<script defer src="/screen-assets/inspection-menu.js"></script>
+</head>
+<body class="work-page">
+<header id="inspection-header" class="hud-header" data-page="history"></header>
+<script src="/screen-assets/inspection-header.js"></script>
+<main class="work-main sc-subpage">
+  <h1>历史记录</h1>
+  <section class="work-panel filter-panel" aria-labelledby="filter-title">
+    <div class="work-section"><h2 id="filter-title">筛选条件</h2></div>
+    <form class="filter-grid" id="filters">
+      <label>评估图片<input class="work-input" id="f-search" type="search" placeholder="搜索图片名称"></label>
+      <label>风险告警<select class="work-input" id="f-risk"><option value="">全部</option><option value="high">仅高风险</option><option value="normal">未触发告警</option></select></label>
+      <label>开始日期<input class="work-input" id="f-from" type="date"></label>
+      <label>结束日期<input class="work-input" id="f-to" type="date"></label>
+      <label>时间排序<select class="work-input" id="f-sort"><option value="time_desc">最新优先</option><option value="time_asc">最早优先</option></select></label>
+      <button class="work-action primary" type="submit" id="f-go">查询</button>
+    </form>
+  </section>
+  <section class="work-panel" aria-labelledby="records-title">
+    <div class="work-section history-records-head">
+      <div class="history-record-count"><h2 id="records-title">评估记录</h2><span class="count" id="f-total" role="status"></span></div>
+      <div class="history-selection"><span class="count" id="selection-count" aria-live="polite"></span><button type="button" id="delete-selected" class="work-action delete-action" disabled>批量删除</button></div>
+    </div>
+    <p id="delete-feedback" role="status" hidden></p>
+    <div class="table-scroll">
+      <table class="work-table">
+        <thead><tr><th scope="col"><label class="selection-cell"><input type="checkbox" id="select-page" disabled>全选本页</label></th><th>编号</th><th>时间</th><th>拍摄机组</th><th>图片</th><th>构件</th><th>损伤类型</th><th>优先级</th><th>风险</th><th>耗时</th><th>备注</th><th>操作</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="12"><div class="sc-empty work-empty">正在加载记录…</div></td></tr></tbody>
+      </table>
+    </div>
+    <nav class="pager" aria-label="评估记录分页">
+      <button id="pg-prev" aria-label="上一页" disabled>‹</button><span id="pg-info" aria-live="polite">1 / 1</span><button id="pg-next" aria-label="下一页" disabled>›</button>
+    </nav>
+  </section>
+</main>
+<dialog class="record-dialog delete-dialog" id="delete-dialog" aria-labelledby="delete-title" aria-describedby="delete-message">
+  <div class="dialog-head"><h2 id="delete-title">删除评估记录</h2></div>
+  <p id="delete-message"></p>
+  <div class="delete-actions"><button type="button" class="work-action" id="delete-cancel" autofocus>取消</button><button type="button" class="work-action delete-action" id="delete-confirm">确认删除</button></div>
+</dialog>
+<dialog class="record-dialog" id="drawer" aria-labelledby="drawer-title">
+  <div class="dialog-head"><h2 id="drawer-title">记录详情</h2><button class="dialog-close" id="drawer-close" aria-label="关闭详情" autofocus>×</button></div>
+  <div class="dialog-body" id="drawer-body"></div>
+  <div class="note-row">
+    <label for="note-input">评估备注</label>
+    <input class="work-input" id="note-input" placeholder="填写评估意见">
+    <button class="work-action primary" id="note-save">保存备注</button>
+  </div>
+</dialog>
+<script src="/screen-assets/report-tools.js"></script>
+<script src="/screen-assets/inspection-report.js"></script>
+<script src="/screen-assets/history.js"></script>
+</body>
+</html>

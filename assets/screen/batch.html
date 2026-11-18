@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#23618c">
+<title>批量评估 · 基于多模态大模型的风电塔灾损测算平台</title>
+<link rel="stylesheet" href="/screen-assets/typography.css">
+<link rel="stylesheet" href="/screen-assets/hud-theme.css">
+<link rel="stylesheet" href="/screen-assets/overview.css">
+<link rel="stylesheet" href="/screen-assets/inspection.css">
+<link rel="stylesheet" href="/screen-assets/batch.css">
+<link rel="stylesheet" href="/screen-assets/inspection-progress.css">
+<link rel="stylesheet" href="/screen-assets/inspection-menu.css">
+<link rel="stylesheet" href="/screen-assets/report-tools.css">
+<script defer src="/screen-assets/inspection-menu.js"></script>
+</head>
+<body class="mountain-hud inspection-mode batch-mode">
+<header id="inspection-header" class="hud-header" data-page="batch"></header>
+<script src="/screen-assets/inspection-header.js"></script>
+<main id="workbench" aria-label="批量评估工作台">
+  <div class="inspection-grid">
+    <section class="inspection-panel image-panel" aria-labelledby="input-title">
+      <header class="inspection-panel-head"><h2 id="input-title">输入图像</h2></header>
+      <div class="image-controls">
+        <div class="turbine-field">
+          <label for="inspection-turbine">拍摄机组</label>
+          <select id="inspection-turbine" name="turbine_id" required disabled aria-describedby="turbine-hint"><option value="">请选择机组</option></select>
+          <span id="turbine-hint" role="status">本批所有图片归入同一台机组。</span>
+          <button type="button" id="retry-turbines" hidden>重新加载</button>
+        </div>
+        <button type="button" class="drop" id="drop" aria-label="选择或追加待评估图片，可多选" aria-controls="files">
+          <i class="icon upload" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 15v5h16v-5M12 16V3M7 8l5-5 5 5"/></svg></i>
+          <strong id="drop-text">选择待评估图片</strong><span class="hint" id="drop-hint">点击或拖入多张 JPG、PNG、WebP</span>
+          <img id="thumbnail" alt="当前评估原图" hidden>
+        </button>
+        <input type="file" id="files" accept="image/*" multiple hidden>
+        <p id="metadata" class="metadata" hidden></p>
+        <div class="upload-actions">
+          <button type="button" id="run" class="primary" disabled>开始批量评估</button>
+          <button type="button" id="clear" class="plain" disabled>清空</button>
+        </div>
+        <div class="analysis-status"><p id="feedback" role="status"></p><span id="batch-elapsed" class="progress-readout" hidden></span></div>
+        <div id="batch-progress" class="progress-track" role="progressbar" aria-label="批量评估进度" aria-valuemin="0" aria-valuemax="100" hidden></div>
+      </div>
+      <section class="inspection-samples batch-queue-section" aria-labelledby="queue-title">
+        <h3 id="queue-title">已选图像</h3>
+        <div id="filelist" hidden></div>
+      </section>
+      <section class="inspection-samples sample-block" aria-labelledby="sample-title">
+        <h3 id="sample-title">评估样例</h3><div id="samples" class="samples"></div>
+      </section>
+      <details class="recent-inspections">
+        <summary>最近评估</summary>
+        <div id="recent" class="empty">暂无评估记录</div><a href="/screen/history">全部历史记录 ↗</a>
+      </details>
+    </section>
+
+    <section class="inspection-panel output-panel" aria-labelledby="output-title">
+      <header class="inspection-panel-head">
+        <h2 id="output-title">结构化评估报告</h2>
+        <span id="report-source" hidden></span><button type="button" id="export" disabled>导出汇总 CSV</button>
+      </header>
+      <dl class="batch-summary" id="sum" aria-label="批量评估统计" hidden>
+        <div><dt>图片总数</dt><dd id="sum-total">0</dd></div>
+        <div><dt>成功</dt><dd id="sum-ok">0</dd></div>
+        <div><dt>高风险</dt><dd id="sum-high">0</dd></div>
+        <div><dt>失败</dt><dd id="sum-fail">0</dd></div>
+      </dl>
+      <div id="batch-alert"></div>
+      <div id="result" class="batch-results" role="region" aria-label="逐图评估结果" tabindex="0"></div>
+      <div id="report-empty">
+        <i class="icon document" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6zM14 3v5h5M9 12h7m-7 4h5"/></svg></i>
+        <p id="report-state">等待输入图像</p>
+        <p id="report-hint">选择图片并点击「开始批量评估」，即可在这里查看每张图像的评估报告。</p>
+      </div>
+      <div id="report-body" hidden>
+        <p id="report-meta"></p><div id="summary" aria-label="评估摘要"></div>
+        <div id="report-tools"></div>
+        <div id="details"></div>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="/screen-assets/inspection-progress.js"></script>
+<script src="/screen-assets/inspection-report.js"></script>
+<script src="/screen-assets/inspection-recent.js"></script>
+<script src="/screen-assets/inspection-turbines.js"></script>
+<script src="/screen-assets/report-tools.js"></script>
+<script src="/screen-assets/batch.js"></script>
+</body>
+</html>

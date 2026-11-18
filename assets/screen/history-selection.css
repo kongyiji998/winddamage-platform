@@ -1,0 +1,15 @@
+.history-records-head, .history-record-count, .history-selection {
+  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+}
+.history-selection {margin-left:auto}
+.history-selection .count:empty {display:none}
+.work-page .delete-action:not(:disabled) {border-color:#d39190;color:#ffd2ca;background:rgba(113,48,54,.68)}
+.work-page .delete-action:not(:disabled):hover {border-color:#ffc0b4;background:rgba(133,54,62,.9)}
+.work-table .selection-cell {display:inline-flex;align-items:center;gap:7px;min-height:26px;cursor:pointer}
+.work-table input[type=checkbox] {width:17px;height:17px;margin:0;accent-color:var(--accent);cursor:pointer}
+.work-table tr:has(input:checked) td {background:rgba(65,157,209,.18)}
+.work-table td.select-row {padding-block:4px}
+#delete-feedback {margin:0;padding:8px 20px;color:var(--text);background:rgba(32,103,138,.35)}
+.work-page .delete-dialog {width:min(390px,calc(100vw - 28px));background:linear-gradient(130deg,#1d4964,#112d45)}
+#delete-message {padding:18px 22px;line-height:1.65}
+.delete-actions {display:flex;justify-content:flex-end;gap:10px;padding:0 22px 18px}

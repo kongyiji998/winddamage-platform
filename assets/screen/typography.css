@@ -1,0 +1,21 @@
+@font-face {
+  font-family: "Smiley Sans";
+  src: url("./fonts/SmileySans-Oblique.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("./fonts/BarlowCondensed-SemiBold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-body: "Noto Sans CJK SC", "Source Han Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-heading: "Smiley Sans", var(--font-body);
+  --font-readout: "Barlow Condensed", "Arial Narrow", var(--font-body);
+}
