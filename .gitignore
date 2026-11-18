@@ -1,5 +1,8 @@
 # 本地模型与训练检查点
 qwen3.5-4b*/
+!/qwen3.5-4b/
+/qwen3.5-4b/*
+!/qwen3.5-4b/.gitkeep
 *.safetensors
 *.safetensors.index.json
 *.gguf
